@@ -1,2 +1,2 @@
 # WindSpots-API
-WindSpots PAI for weather data query
+WindSpots API for weather data query
