@@ -5,13 +5,14 @@ WindSpots API is using Luracast Restler 5.0.10 https://packagist.org/packages/lu
 
 API returns data in json or xml
 
-> **Spot Type:**
-> 
-> 1 = KITE,
-> 2 = WINDSURF,
-> 4 = PADDLE,
-> 8 = PARAGLIDE,
-> 16 = SWIMMING
+Spot Type:
+<pre> 
+ 1 = KITE,
+ 2 = WINDSURF,
+ 4 = PADDLE,
+ 8 = PARAGLIDE,
+ 16 = SWIMMING
+</pre>
 
 for API browsing
 https://api.windspots.org/explorer/
@@ -49,14 +50,12 @@ https://api.windspots.org/mobile/stationdataext.json?station=CHGE08&last=true
 https://api.windspots.org/mobile/stationdataext.json?station=CHVD12&last=false&from=2022-03-13%2011:00:00&to=2022-03-14%2009:00:00&ten=false
 
 Gives wind information based on criteria. The duration between the start (from) and the end (to) must be a maximum of 24 hours
-
-> last: latest value only (boolean) (in case of true: from, to and ten are ignored)
-
-> from: SQL date fom format YYY-MM-DD HH:MM:SS
-
-> to: SQL date fom format YYY-MM-DD HH:MM:SS
-
-> ten: for ten minutes step (boolean)
+<pre>
+ last: latest value only (boolean) (in case of true: from, to and ten are ignored)
+ from: SQL date fom format YYY-MM-DD HH:MM:SS
+ to: SQL date fom format YYY-MM-DD HH:MM:SS
+ ten: for ten minutes step (boolean)
+</pre>
 
 Station Forecast
 ----------------
