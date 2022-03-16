@@ -48,7 +48,18 @@ https://api.windspots.org/mobile/stationdataext.json?station=CHGE08&last=true
 
 https://api.windspots.org/mobile/stationdataext.json?station=CHVD12&last=false&from=2022-03-13%2011:00:00&to=2022-03-14%2009:00:00&ten=false
 
-last: latest value only (boolean)
-from: SQL date fom format YYY-MM-DD HH:MM:SS
-to: SQL date fom format YYY-MM-DD HH:MM:SS
-ten: for ten minutes step (boolean)
+Gives wind information based on criteria. The duration between the start (from) and the end (to) must be a maximum of 24 hours
+
+> last: latest value only (boolean) (in case of true: from, to and ten are ignored)
+
+> from: SQL date fom format YYY-MM-DD HH:MM:SS
+
+> to: SQL date fom format YYY-MM-DD HH:MM:SS
+
+> ten: for ten minutes step (boolean)
+
+Station Forecast
+----------------
+https://api.windspots.org/mobile/stationforecast?station=CHGE04
+
+Gives wind forecast for the next 18 hours
