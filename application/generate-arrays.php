@@ -75,10 +75,12 @@ function windQuery($windId, $durationMinutes) {
       'gust' => "".min($data['gust'], 99));
   }
   $windDirection = array('name' => "wind", 'points' => $point );
-  $wind_average_speed = round(($wind_average_speed / $wind_nb), 2);
+  if($wind_nb != 0 && $wind_average_speed) {
+    $wind_average_speed = round(($wind_average_speed / $wind_nb), 2);
+  }
   return $windDirection;
 }
-function stationinfo($station=NULL) {
+function stationinfo($station=NULL,$operational=FALSE) {
   // http://api.windspots.org/mobile/stationinfo
   global $windspotsData;
   $stationInfo = array('stationinfos');
@@ -98,35 +100,49 @@ function stationinfo($station=NULL) {
     $Direction = 0;
     $Speed = 0.0;
     $Gust = 0.0;
+    if($operational == TRUE) {
+      $diff = ceil((time() - strtotime($stationData['data_time'])) / (60));
+      if($diff >= 15)
+        continue;
+    }
     if(!empty($stationData['wind_id']) ){
       $SensorResultArray = WindspotsDB::getSensorData($stationData['wind_id']);
-      $SensorResult = $SensorResultArray[0];
-      if(is_array($SensorResult)) {
-        $Direction = $SensorResult['direction'];
-        $Speed = $SensorResult['speed'];
-        $Gust = $SensorResult['gust'];
+      if(sizeof($SensorResultArray)>=1) {
+        $SensorResult = $SensorResultArray[0];
+        if(is_array($SensorResult)) {
+          $Direction = $SensorResult['direction'];
+          $Speed = $SensorResult['speed'];
+          $Gust = $SensorResult['gust'];
+        }
       }
     }
     if(!empty($stationData['barometer_id']) ){
       $SensorResultArray = WindspotsDB::getSensorData($stationData['barometer_id']);
-      $SensorResult = $SensorResultArray[0];
-      if(is_array($SensorResult)){
-        $Barometer = $SensorResult['barometer'];
+      if(sizeof($SensorResultArray)>=1) {
+        $SensorResult = $SensorResultArray[0];
+        if(is_array($SensorResult)){
+          $Barometer = $SensorResult['barometer'];
+        }
       }
     }
     if(!empty($stationData['temperature_id']) ){
       $SensorResultArray = WindspotsDB::getSensorData($stationData['temperature_id']);
+      if(sizeof($SensorResultArray)>=1) {
       $SensorResult = $SensorResultArray[0];
-      if(is_array($SensorResult)){
-        $Temperature = $SensorResult['temperature'];
-        $Humidity = $SensorResult['humidity'];
+        if(is_array($SensorResult)){
+          $Temperature = $SensorResult['temperature'];
+          $Humidity = $SensorResult['humidity'];
+        }
       }
     }
     if(!empty($stationData['water_id']) ){
-      $SensorResultArray = WindspotsDB::getSensorData($stationData['water_id']);
-      $SensorResult = $SensorResultArray[0];
-      if(is_array($SensorResult)){
-        $TemperatureWater = $SensorResult['temperature'];
+      $SensorResultArray = WindspotsDB::getSensorData($stationData['water_id'], 60);
+      // echo "Water - ".json_encode($SensorResultArray)."\r\n";
+      if(sizeof($SensorResultArray)>=1) {
+        $SensorResult = $SensorResultArray[0];
+        if(is_array($SensorResult)){
+          $TemperatureWater = $SensorResult['temperature'];
+        }
       }
     }  
     $stationInfo[$i++]=array(
@@ -157,8 +173,12 @@ function stationinfo($station=NULL) {
   if($station != NULL) {  // called from stationdata or stationforecast
     return $stationInfo[0];
   }
-  echo "Stations - ".$i."\r\n";
-  file_put_contents($windspotsData.'/'.'stationInfo.txt', serialize($stationInfo));
+  // echo "Stations - ".$i."\r\n";
+  if($operational == TRUE) {
+    file_put_contents($windspotsData.'/'.'stationInfoo.txt', serialize($stationInfo));
+  } else {
+    file_put_contents($windspotsData.'/'.'stationInfo.txt', serialize($stationInfo));
+  }
   return;
 }
 function stationdata($durationHours=1) {
@@ -244,14 +264,14 @@ function stationforecast(){
     }
     $windDirection = array(
       'name' => "forecast",
-      'status' => maintenanceStatus(strtotime($station['data_time']), 0),
+      'status' => WindspotsDB::maintenanceStatus(strtotime($station['data_time']), 0),
       'lastUpdate' => $station['data_time'],
       'update' => "".strtotime($station['data_time'])."000",
       'windMax' => "".$windmax,
       'nbPoints' => "".$i,
       'points' => $point,
      );
-    echo $station['station_name']." - ".$i."\r\n";
+    // echo $station['station_name']." - ".$i."\r\n";
     file_put_contents($windspotsData.'/'.$station['station_name'].'f.txt', serialize($windDirection));     
   } //  foreach($stations as $key => $station)
   return;      
@@ -261,6 +281,7 @@ echo "generateArrays.php started.\r\n";
 // Generate stationInfo
 echo "Generate station Info.\r\n";
 stationinfo();
+stationinfo(NULL, TRUE);
 // Generate Station Data
 echo "Generate station Data 1h.\r\n";
 stationdata(1);
@@ -272,5 +293,5 @@ echo "Generate station Forecast.\r\n";
 stationforecast();
 echo "generateArrays.php finished.\r\n";
 $et = microtime(true) - $mt;
-echo "Elapsed time: ". number_format($et,5)."\r\n;";
+echo "Elapsed time: ". number_format($et,5)."\r\n";
 ?>

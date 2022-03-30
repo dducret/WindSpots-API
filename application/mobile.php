@@ -36,11 +36,14 @@ class mobile {
   function hello($to='world') {
     return "Welcome $to in WindSpots API!";
   }
-  function stationinfo() {
+  function stationinfo($operational=FALSE) {
     // https://api.windspots.org/mobile/stationinfo
     // https://api.windspots.org/mobile/stationinfo.json
     global $windspotsData;
-    $value = unserialize( file_get_contents($windspotsData.'/stationInfo.txt') );
+    if($operational == TRUE)
+      $value = unserialize( file_get_contents($windspotsData.'/stationInfoo.txt') );
+    else
+      $value = unserialize( file_get_contents($windspotsData.'/stationInfo.txt') );
     return array('stationInfo' => $value);
   }
   function stationdata($station=NULL, $duration=1) {
