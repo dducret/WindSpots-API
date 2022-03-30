@@ -33,6 +33,12 @@ https://api.windspots.org/mobile/stationinfo.json
 
 Gives the list of stations with the latest data
 
+Operationl only
+
+https://api.windspots.org/mobile/stationinfo?operational=true
+
+https://api.windspots.org/mobile/stationinfo.json?operational=true
+
 Station Data
 ------------
 https://api.windspots.org/mobile/stationdata?station=CHGE04&duration=1
