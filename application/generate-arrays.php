@@ -20,6 +20,31 @@ function logIt($message) {
   fwrite($wlHandle, Date("H:i:s").".$micro"." forecast.php: ".$message."\n");
   fclose($wlHandle);
 }
+function kt_2_bft($speed_kt) {
+  $bft=0;
+  if($speed_kt>=1)    $bft=1;
+  if($speed_kt>=3)    $bft=2;
+  if($speed_kt>=7)    $bft=3;
+  if($speed_kt>=11)   $bft=4;
+  if($speed_kt>=17)   $bft=5;
+  if($speed_kt>=22)   $bft=6;
+  if($speed_kt>=28)   $bft=7;
+  if($speed_kt>=34)   $bft=8;
+  if($speed_kt>=41)   $bft=9;
+  if($speed_kt>=49)   $bft=10;
+  if($speed_kt>=56)   $bft=11;
+  if($speed_kt>=65)   $bft=12;
+  return $bft;
+}
+function ms_2_kt($speed_ms){
+  return round((($speed_ms*3.6)/1.852),0);
+}
+function ms_2_kmh($speed_ms){
+  return round((($speed_ms*3.6)),1);
+}
+function ms_2_bft($speed_ms){
+  return kt_2_bft(round((($speed_ms*3.6)/1.852),0));
+}
 // Global
 $wind_min_speed     = 0;
 $wind_average_speed = 0;
@@ -71,8 +96,8 @@ function windQuery($windId, $durationMinutes) {
     $point[$wind_nb++]=array(
       'date' => "".strtotime($data['sensor_time'])."000",
       'direction' => "".$data['direction'],
-      'speed' => "".min($data['speed'], 99),
-      'gust' => "".min($data['gust'], 99));
+      'speed' => "".ms_2_kmh(min($data['speed'], 99)),
+      'gust' => "".ms_2_kmh(min($data['gust'], 99)));
   }
   $windDirection = array('name' => "wind", 'points' => $point );
   if($wind_nb != 0 && $wind_average_speed) {
@@ -161,8 +186,8 @@ function stationinfo($station=NULL,$operational=FALSE) {
       'imageTime' => $stationData['image_time'],
       "direction"  => "".$Direction,
       "directionAlpha"  => "".WindspotsDB::directionAlpha($Direction),
-      "speed"  => "".$Speed,
-      "gust"  => "".$Gust,
+      "speed"  => "".ms_2_kmh($Speed),
+      "gust"  => "".ms_2_kmh($Gust),
       "barometer"  => "".$Barometer,
       "temperature"  => "".$Temperature,
       "humidity"  => "".$Humidity,
@@ -212,9 +237,9 @@ function stationdata($durationHours=1) {
       'spotType'=> "".$stationInfo['spotType'],
       'windChart' => array('duration' => "".($durationHours*60), 
         'serie' => windQuery($stationInfo['windId'], ($durationHours*60))),
-      'windChartMin' => "".$wind_min_speed,
-      'windChartAverage' => "".$wind_average_speed, 
-      'windChartMax' => "".$wind_max_speed
+      'windChartMin' => "".ms_2_kmh($wind_min_speed),
+      'windChartAverage' => "".ms_2_kmh($wind_average_speed), 
+      'windChartMax' => "".ms_2_kmh($wind_max_speed)
     );
     // echo $stationData['stationId']." - ".$wind_nb." - max speed ".$wind_max_speed." - ".$stationData['windChartMax']."\r\n";
     file_put_contents($windspotsData.'/'.$stationInfo['stationName'].$ext.'.txt', serialize($stationData));
@@ -256,10 +281,10 @@ function stationforecast(){
       $point[$i++]=array(
         'date' => "".strtotime($forecast["reference_time"])."000",
         'direction' => "".round($forecast["direction"],0),
-        'speed' => "".$forecastSpeed,
+        'speed' => "".ms_2_kmh($forecastSpeed),
         'stationdirection' => "".$direction,
-        'stationspeed' => "".$speed,
-        'stationgust' => "".$gust,
+        'stationspeed' => "".ms_2_kmh($speed),
+        'stationgust' => "".ms_2_kmh($gust),
       );
     }
     $windDirection = array(
@@ -267,7 +292,7 @@ function stationforecast(){
       'status' => WindspotsDB::maintenanceStatus(strtotime($station['data_time']), 0),
       'lastUpdate' => $station['data_time'],
       'update' => "".strtotime($station['data_time'])."000",
-      'windMax' => "".$windmax,
+      'windMax' => "".ms_2_kmh($windmax),
       'nbPoints' => "".$i,
       'points' => $point,
      );
