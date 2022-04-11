@@ -281,10 +281,10 @@ function stationforecast(){
       $point[$i++]=array(
         'date' => "".strtotime($forecast["reference_time"])."000",
         'direction' => "".round($forecast["direction"],0),
-        'speed' => "".ms_2_kmh($forecastSpeed),
+        'speed' => "".$forecastSpeed,
         'stationdirection' => "".$direction,
-        'stationspeed' => "".ms_2_kmh($speed),
-        'stationgust' => "".ms_2_kmh($gust),
+        'stationspeed' => "".$speed,
+        'stationgust' => "".$gust,
       );
     }
     $windDirection = array(
@@ -292,7 +292,7 @@ function stationforecast(){
       'status' => WindspotsDB::maintenanceStatus(strtotime($station['data_time']), 0),
       'lastUpdate' => $station['data_time'],
       'update' => "".strtotime($station['data_time'])."000",
-      'windMax' => "".ms_2_kmh($windmax),
+      'windMax' => "".$windmax,
       'nbPoints' => "".$i,
       'points' => $point,
      );
