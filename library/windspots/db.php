@@ -151,14 +151,19 @@ class WindspotsDB{
     //order limit
     $query .= " ORDER BY `sensor_time` DESC LIMIT 1 ;";
     $data = $dbLink->query($query);
+    if($data === null) {
+      $dbLink->close();
+      return NULL;
+    }
     if($data==false){
       error_log("getStationSensorData limit 1 error : ".$dbLink->error."\r\n");
       $dbLink->close();
       return NULL; 
     }
-    $result = $data->fetch_assoc();
+    $sensorData = $data->fetch_assoc();
     $data->close();
     $dbLink->close();
+    $result[] = $sensorData;
     return $result;
   }
   public static function getStations($online = true){
